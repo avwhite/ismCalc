@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Calc.h"
 
-int main()
+int main(int arc, char* argv[])
 {
     Calc c;
-    std::cout << c.calc("11/12") << std::endl;
+    std::cout << c.calc(argv[1]) << std::endl;
 
     return 0;
 }
