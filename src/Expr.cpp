@@ -6,6 +6,7 @@
 Val::Val(double value)
 {
     val = value;
+    error = false;
 }
 
 Val::~Val()
@@ -26,6 +27,7 @@ Op::Op(OpType opType, Expr* lefts, Expr* rights)
     type = opType;
     left = lefts;
     right = rights;
+    error = false;
 }
 
 Op::~Op()
@@ -36,6 +38,10 @@ Op::~Op()
 
 double Op::eval()
 {
+    if(right->error == true || left->error == true)
+    {
+        return 0;
+    }
     switch (type)
     {
         case ADD: return left->eval() + right->eval(); break;

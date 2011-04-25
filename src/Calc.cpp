@@ -88,11 +88,20 @@ std::vector<Token> Calc::tokenize(std::string input)
 
 Expr* Calc::parse(std::vector<Token> tokens)
 {
+
     if(tokens.size() == 1 && tokens.at(0).type == VAL)
     {
         //this is going to be ar leaf node, just return the value.
         Expr* e = new Val(atof(tokens.at(0).value.c_str()));
         return e;
+    }
+
+    //expression starting with or ending with and operator or containing multiple ops in a row.
+    if(tokens.front().type == OP || tokens.back().type == OP)
+    {
+        Expr* error = new Val(0);
+        error->error = true;
+        return error;
     }
 
     //This is not a leaf node, start looking for operators in the correct order.

@@ -7,6 +7,7 @@ class Expr
 {
     public:
         virtual double eval() = 0;
+        bool error;
 };
 
 class Op : public Expr
