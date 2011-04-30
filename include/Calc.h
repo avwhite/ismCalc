@@ -20,6 +20,9 @@ class Calc
     private:
         std::vector<Token> tokenize(std::string input);
         Expr* parse(std::vector<Token> tokens);
+
+        //data structure containing variables
+        //data structure containing functions
 };
 
 #endif // CALC_H
