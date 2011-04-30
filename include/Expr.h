@@ -1,12 +1,16 @@
 #ifndef EXPR_H
 #define EXPR_H
 
+#include <utility>
+
+typedef std::pair<double,bool> optDouble;
+
 enum OpType {ADD, SUB, MUL, DIV};
 
 class Expr
 {
     public:
-        virtual double eval() = 0;
+        virtual optDouble eval() = 0;
         bool error;
 };
 
@@ -16,7 +20,7 @@ class Op : public Expr
         Op(OpType opType, Expr* lefts, Expr* rights);
         virtual ~Op();
 
-        double eval();
+        optDouble eval();
     private:
         Expr* left;
         Expr* right;
@@ -29,9 +33,20 @@ class Val : public Expr
         Val(double value);
         virtual ~Val();
 
-        double eval();
+        optDouble eval();
     private:
         double val;
+};
+
+class Paran : public Expr
+{
+    public:
+        Paran(Expr* expr);
+        virtual ~Paran();
+
+        optDouble eval();
+    private:
+        Expr* expr;
 };
 
 #endif // EXPR_H

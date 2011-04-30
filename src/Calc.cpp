@@ -1,6 +1,8 @@
 #include "Calc.h"
 #include "Utils.h"
 
+#include <iostream>
+
 Calc::Calc()
 {
     //ctor
@@ -11,9 +13,11 @@ Calc::~Calc()
     //dtor
 }
 
-double Calc::calc(std::string expression)
+optDouble Calc::calc(std::string expression)
 {
-    return parse(tokenize(expression))->eval();
+    std::vector<Token> t = tokenize(expression);
+    Expr* e = parse(t);
+    return e->eval();
 }
 
 std::vector<Token> Calc::tokenize(std::string input)
@@ -48,17 +52,28 @@ std::vector<Token> Calc::tokenize(std::string input)
         {
             res.push_back(Token(OP, std::string(1,current)));
         }
+        else if(current == '(' || current == ')')
+        {
+            res.push_back(Token(PARAN, std::string(1, current)));
+        }
     }
     return res;
 }
 
 Expr* Calc::parse(std::vector<Token> tokens)
 {
-
     if(tokens.size() == 1 && tokens.at(0).type == VAL)
     {
         //this is going to be ar leaf node, just return the value.
         Expr* e = new Val(atof(tokens.at(0).value.c_str()));
+        return e;
+    }
+
+    if((tokens.front().type == PARAN) && (tokens.front().value == "(") && (tokens.back().type == PARAN && tokens.back().value == ")"))
+    {
+        std::vector<Token> v;
+        v.assign(++tokens.begin(), --tokens.end());
+        Expr* e = new Paran(parse(v));
         return e;
     }
 
@@ -72,29 +87,35 @@ Expr* Calc::parse(std::vector<Token> tokens)
 
     //This is not a leaf node, start looking for operators in the correct order.
     int i2;
+    //inParan is for keeping track of if we are inside a paranthesis. If this value is 0, then we are not, and we can split the token vector. if it is >0 we can not split it.
+    int inParan;
     std::vector<Token>::iterator i;
-    for( i = tokens.begin(), i2 = 0; i != tokens.end(); ++i, ++i2)
+    for( i = tokens.begin(), i2 = 0, inParan = 0; i != tokens.end(); ++i, ++i2)
     {
         Token t = *i;
-        if(t.type == OP && (t.value == "+" || t.value == "-"))
+        if(t.type == OP && (t.value == "+" || t.value == "-") && inParan == 0)
         {
             tPair tp = split(tokens, i2);
 
             Expr* e = new Op((t.value == "+") ? (ADD) : (SUB), parse(tp.first), parse(tp.second));
             return e;
         }
+        if(t.type == PARAN)
+            (t.value == "(") ? (++inParan) : (--inParan);
     }
 
-    for(i = tokens.begin(), i2 = 0; i != tokens.end(); ++i, ++i2)
+    for(i = tokens.begin(), i2 = 0, inParan = 0; i != tokens.end(); ++i, ++i2)
     {
         Token t = *i;
-        if(t.type == OP && (t.value == "*" || t.value == "/"))
+        if(t.type == OP && (t.value == "*" || t.value == "/") && inParan == 0)
         {
             tPair tp = split(tokens, i2);
 
             Expr* e = new Op((t.value == "*") ? (MUL) : (DIV), parse(tp.first), parse(tp.second));
             return e;
         }
+        if(t.type == PARAN)
+            (t.value == "(") ? (++inParan) : (--inParan);
     }
 
     //Log some form of error message somewhere, becaouse this is NEVER supposed to be executed!

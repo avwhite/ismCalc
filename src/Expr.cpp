@@ -14,9 +14,9 @@ Val::~Val()
     //dtor
 }
 
-double Val::eval()
+optDouble Val::eval()
 {
-    return val;
+    return optDouble(val, true);
 }
 
 //////////////////////
@@ -36,17 +36,40 @@ Op::~Op()
     delete right;
 }
 
-double Op::eval()
+optDouble Op::eval()
 {
     if(right->error == true || left->error == true)
-    {
-        return 0;
-    }
+        return optDouble(0,false);
+    optDouble l = left->eval();
+    optDouble r = right->eval();
+    if(l.second == false || r.second == false)
+        return optDouble(0,false);
+
     switch (type)
     {
-        case ADD: return left->eval() + right->eval(); break;
-        case SUB: return left->eval() - right->eval(); break;
-        case MUL: return left->eval() * right->eval(); break;
-        case DIV: return left->eval() / right->eval(); break;
+        case ADD: return optDouble(l.first + r.first, true); break;
+        case SUB: return optDouble(l.first - r.first, true); break;
+        case MUL: return optDouble(l.first * r.first, true); break;
+        case DIV: return optDouble(l.first / r.first, true); break;
     }
+}
+
+/////////////////////////
+//Paran implementation//
+///////////////////////
+
+Paran::Paran(Expr* expr)
+{
+    this->expr = expr;
+    error = false;
+}
+
+Paran::~Paran()
+{
+    delete expr;
+}
+
+optDouble Paran::eval()
+{
+    return expr->eval();
 }

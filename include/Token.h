@@ -3,13 +3,14 @@
 
 #include <string>
 
-enum TokenType {OP, VAL};
+enum TokenType {OP, VAL, PARAN};
 
 class Token
 {
     public:
         Token(TokenType type, std::string value);
         virtual ~Token();
+
         TokenType type;
         std::string value;
 };

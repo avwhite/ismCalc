@@ -16,7 +16,7 @@ class Calc
         Calc();
         virtual ~Calc();
 
-        double calc(std::string expression);
+        optDouble calc(std::string expression);
     private:
         std::vector<Token> tokenize(std::string input);
         Expr* parse(std::vector<Token> tokens);
